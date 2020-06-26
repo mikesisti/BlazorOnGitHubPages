@@ -70,7 +70,7 @@
                 // This is needed only because GitHub pages doesn't natively support Brotli (or even gzip for .dll files)
                 if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
                     return (async function () {
-                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache', integrity: integrity, headers: { 'blazor-environment': environmentName } });
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache', headers: { 'blazor-environment': environmentName } });
                         if (!response.ok) {
                             throw new Error(response.statusText);
                         }
