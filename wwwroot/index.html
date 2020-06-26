@@ -51,16 +51,26 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="decode.js"></script>
+    <!--<script>
+        const originalFetch = fetch;
+        const envName = 'development';
+        fetch = async (url, options) => {
+            const response = await originalFetch(url, options);
+            return url.endsWith('/blazor.boot.json')
+                ? new Response(await response.blob(), { headers: { 'blazor-environment':  envName } })
+                : response;
+        };
+    </script>-->
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
-        const environmentName = 'development';
+        const environmentName = 'production';
         Blazor.start({
             loadBootResource: function (type, name, defaultUri, integrity) {
                 // For framework resources, use the precompressed.br files for faster downloads
                 // This is needed only because GitHub pages doesn't natively support Brotli (or even gzip for .dll files)
                 if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
                     return (async function () {
-                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' }, { headers: { 'blazor-environment': environmentName } });
                         if (!response.ok) {
                             throw new Error(response.statusText);
                         }
@@ -68,7 +78,7 @@
                         const originalResponseArray = new Int8Array(originalResponseBuffer);
                         const decompressedResponseArray = BrotliDecode(originalResponseArray);
                         const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
-                        return new Response(decompressedResponseArray, { headers: { 'content-type': contentType, 'blazor-environment': environmentName } });
+                        return new Response(decompressedResponseArray, { headers: { 'content-type': contentType } });
                     })();
                 }
             }
